@@ -35,6 +35,7 @@ int main(int argc, char **argv)
 	}
 
 	tty.input_hook = (void *) keylogger;
+	tty.stdin_fd = STDIN_FILENO;
 
 	// set to raw mode
 	raw_mode(&tios, STDIN_FILENO);
