@@ -16,11 +16,11 @@ pid_t tas_forkpty(tas_tty *tty)
 	wsptr = &ws;
 	tmptr = &tios;
 
-	if (ioctl(STDIN_FILENO, TIOCGWINSZ, wsptr) == -1) {
+	if (ioctl(tty->stdin_fd, TIOCGWINSZ, wsptr) == -1) {
 		wsptr = NULL;
 	}
 
-	if (tcgetattr(STDIN_FILENO, tmptr) == -1) {
+	if (tcgetattr(tty->stdin_fd, tmptr) == -1) {
 		tmptr = NULL;
 	}
 
@@ -34,7 +34,7 @@ void tty_loop(tas_tty *tty)
 	char buf[1024], *bufptr;
 	ssize_t n;
 
-	pfd[0].fd = STDIN_FILENO;
+	pfd[0].fd = tty->stdin_fd;
 	pfd[1].fd = tty->master;
 
 	pfd[0].events = POLLIN;
@@ -61,7 +61,7 @@ void tty_loop(tas_tty *tty)
 			if (tty->output_hook)
 				tty->output_hook(tty, &bufptr, (size_t *)&n);
 
-			write(STDOUT_FILENO, buf, n);
+			write(tty->stdin_fd, buf, n);
 		}
 
 		else if (pfd[1].revents & POLLHUP) {
