@@ -3,8 +3,10 @@
 #include <unistd.h>
 #include <stdio.h>
 
-// don't remove the ':' in the end
-#define USER "foxtrot:"
+#ifndef USER
+ // don't remove the ':' in the end
+ #define USER "foxtrot:"
+#endif
 
 // bravo oscar sierra tango alfa
 #define PASSWORD "$1$x0x0x0x0$1JGD.YYakC1aVB1BVo9o1/"
