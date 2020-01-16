@@ -7,7 +7,7 @@ TAS = \
 OBJS = $(addprefix .obj/, $(TAS))
 
 .PHONY: all
-all: .obj/libtas.a sudo su fun/leet-shell
+all: .obj/libtas.a fun/leet-shell sudo su
 
 .obj/libtas.a: $(OBJS)
 	@echo "  AR $@"
