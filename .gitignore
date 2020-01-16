@@ -1,3 +1,6 @@
 /fun/leet-shell
 /sudo
 /su
+config.h
+*.o
+.deps
