@@ -20,6 +20,7 @@ int tas_execv(const char *cmd, char * const *argv)
 	}
 
 	else {
+		path = strdup(path);
 		pathname = malloc(strlen(cmd) + strlen(path) + 2);
 
 		do {
