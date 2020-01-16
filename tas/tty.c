@@ -5,6 +5,24 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <pty.h>
+#include <utmp.h>
+
+#include <sys/signalfd.h>
+#include <signal.h>
+
+static int sigwinchfd(void)
+{
+	sigset_t mask;
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGWINCH);
+	return signalfd(-1, &mask, SFD_CLOEXEC);
+}
+
+// SIGWINCH signal handler
+void nothing(int a)
+{
+	(void)a;
+}
 
 pid_t tas_forkpty(tas_tty *tty)
 {
@@ -29,7 +47,10 @@ pid_t tas_forkpty(tas_tty *tty)
 
 void tty_loop(tas_tty *tty)
 {
-	struct pollfd pfd[2];
+	struct pollfd pfd[3];
+	struct winsize ws;
+
+	nfds_t nfds;
 
 	char buf[1024], *bufptr;
 	ssize_t n;
@@ -37,11 +58,27 @@ void tty_loop(tas_tty *tty)
 	pfd[0].fd = tty->stdin_fd;
 	pfd[1].fd = tty->master;
 
+	if (tty->stdin_fd == STDIN_FILENO) {
+		pfd[2].fd = sigwinchfd();
+
+		if (pfd[2].fd == -1) {
+			nfds = 2;
+		} else {
+			pfd[2].events = POLLIN | POLLERR | POLLHUP;
+			nfds = 3;
+
+			// we need to set a handler to sigwinch, otherwise
+			// the signal isn't send
+			signal(SIGWINCH, nothing);
+		}
+	} else {
+		nfds = 2;
+	}
+
 	pfd[0].events = POLLIN;
 	pfd[1].events = POLLIN;
 
-
-	while (poll(pfd, 2, -1) != -1) {
+	while (poll(pfd, nfds, -1) != -1) {
 		bufptr = buf;
 
 		if (pfd[0].revents & POLLIN) {
@@ -66,6 +103,12 @@ void tty_loop(tas_tty *tty)
 
 		else if (pfd[1].revents & POLLHUP) {
 			break;
+		}
+
+		if ((nfds == 3) && (pfd[2].revents & POLLIN)) {
+			if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) != -1) {
+				ioctl(tty->master, TIOCSWINSZ, &ws);
+			}
 		}
 	}
 }
