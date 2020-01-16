@@ -36,4 +36,5 @@ fun/leet-shell: fun/leet-shell.c .obj/libtas.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -static -lutil
 
 clean:
-	rm -f $(OBJS) sudo su fun/leet-shell
+	rm -f $(OBJS) sudo su fun/leet-shell \
+	 fakebins/sudo/config.h fakebins/su/config.h
