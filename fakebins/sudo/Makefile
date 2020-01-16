@@ -1,6 +1,12 @@
 CFLAGS+=-Wall -Wextra -I../..
-LDFLAGS+=-static
+LDFLAGS+=-static -lutil
 
-../../sudo: main.c ../../.obj/libtas.a
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+.PHONY: config.h
+all: config.h ../../sudo
+
+../../sudo: main.c ../../.obj/libtas.a config.h
+	$(CC) $(CFLAGS) -o $@ main.c ../../.obj/libtas.a $(LDFLAGS)
 	strip $@
+
+config.h:
+	@../../configure sudo
