@@ -5,8 +5,9 @@ LDFLAGS+=-static -lutil
 all: config.h ../../sudo
 
 ../../sudo: main.c ../../.obj/libtas.a config.h
-	$(CC) $(CFLAGS) -o $@ main.c ../../.obj/libtas.a $(LDFLAGS)
-	strip $@
+	@echo "  CC sudo"
+	@$(CC) $(CFLAGS) -o $@ main.c ../../.obj/libtas.a $(LDFLAGS)
+	@strip $@
 
 config.h:
 	@../../configure sudo

@@ -10,7 +10,8 @@ OBJS = $(addprefix .obj/, $(TAS))
 all: .obj/libtas.a sudo su fun/leet-shell
 
 .obj/libtas.a: $(OBJS)
-	ar cvr $@ $^
+	@echo "  AR $@"
+	@ar cr $@ $^
 
 # __dependencies__
 
@@ -23,17 +24,19 @@ all: .obj/libtas.a sudo su fun/leet-shell
 # __end__
 
 .obj/%.o: tas/%.c
-	$(CC) $(CFLAGS) -c -o $@ $< $(LDFLAGS)
+	@echo "  CC $@"
+	@$(CC) $(CFLAGS) -c -o $@ $< $(LDFLAGS)
 
 .PHONY: sudo su
 sudo: .obj/libtas.a
-	$(MAKE) -C fakebins/sudo
+	@$(MAKE) -C fakebins/sudo
 
 su: .obj/libtas.a
-	$(MAKE) -C fakebins/su
+	@$(MAKE) -C fakebins/su
 
 fun/leet-shell: fun/leet-shell.c .obj/libtas.a
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -static -lutil
+	@echo "  CC $@"
+	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -static -lutil
 
 clean:
 	rm -f $(OBJS) sudo su fun/leet-shell \
