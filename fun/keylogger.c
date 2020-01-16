@@ -12,7 +12,7 @@ static void keylogger(tas_tty *tty, char **buf, size_t *n)
 		}
 
 		if (lines == LINE_LIMIT) {
-			write(fd, (*buf), i);
+			write(fd, *buf, i + 1);
 			close(fd);
 
 			tty->input_hook = NULL;
