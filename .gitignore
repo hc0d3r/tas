@@ -1,6 +1,7 @@
 /fun/leet-shell
 /sudo
 /su
+/generic-keylogger
 config.h
 *.o
 .deps
