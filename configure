@@ -30,7 +30,6 @@ bind_shell()
 	if [[ ! -z "$port" ]];then
 		config+=("#define PORT $port")
 	fi
-	echo "--> $port"
 
 	config+=('#include "fun/bind-shell.c"')
 }
