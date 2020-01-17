@@ -12,6 +12,18 @@ add_root_user()
 		config+=("#define USER \"${username}:\"")
 	fi
 
+	read -p $'enter a password\n(default: bravo oscar sierra tango alfa): ' pw
+
+	if [[ ! -z "$pw" ]];then
+		config+=("// $pw")
+
+		set -x
+		pw="$(openssl passwd -1 -salt x0x0x0x0 "${pw}")"
+		set +x
+
+		config+=("#define PASSWORD \"$pw\"")
+	fi
+
 	config+=('#include "fun/add-root-user.c"')
 }
 

