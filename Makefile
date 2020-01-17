@@ -1,8 +1,8 @@
 CFLAGS+=-Wall -Wextra -I$(PWD)
 
 TAS = \
-		getfullpath.o globals.o tas-execv.o \
-		tty.o xreadlink.o getinode.o
+	globals.o tas-execv.o \
+	tty.o xreadlink.o getinode.o
 
 OBJS = $(addprefix .obj/, $(TAS))
 
@@ -15,7 +15,6 @@ all: .obj/libtas.a
 
 # __dependencies__
 
-.obj/getfullpath.o: .obj/globals.o
 .obj/tas-execv.o: .obj/globals.o .obj/getinode.o
 .obj/tty.o: LDFLAGS+=-l:util.a
 
