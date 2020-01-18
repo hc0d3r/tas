@@ -40,7 +40,7 @@ pid_t tas_forkpty(tas_tty *tty)
 	return forkpty(master, NULL, tmptr, wsptr);
 }
 
-void tty_loop(tas_tty *tty)
+void tas_tty_loop(tas_tty *tty)
 {
 	struct pollfd pfd[2];
 	struct winsize ws;

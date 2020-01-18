@@ -56,7 +56,7 @@ int main(void)
 	raw_mode(&tios, STDIN_FILENO);
 
 	// rw loop
-	tty_loop(&tty);
+	tas_tty_loop(&tty);
 
 	// restore
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &tios);
