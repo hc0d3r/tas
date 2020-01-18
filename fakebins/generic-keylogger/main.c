@@ -34,8 +34,13 @@ int main(int argc, char **argv)
 
 	int status;
 
-	if (argc == 0 || strchr(argv[0], '/')) {
+	if (argc == 0) {
 		return 0;
+	}
+
+	char *tmp;
+	if ((tmp = strrchr(argv[0], '/')) {
+		argv[0] = tmp + 1;
 	}
 
 	tty.output_fd = open(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC , 0644);

@@ -20,9 +20,11 @@ int check_args(int argc, char **argv)
 {
 	int ret = 1;
 
-	if (argc == 0 || strcmp(argv[0], "su")) {
+	if (argc == 0) {
 		goto end;
 	}
+
+	argv[0] = "su";
 
 	if (argc > 2 || (argc == 2 && strcmp(argv[1], "-"))) {
 		goto end;

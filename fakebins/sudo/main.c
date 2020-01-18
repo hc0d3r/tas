@@ -20,10 +20,10 @@ int check_args(int argc, char **argv)
 		goto end;
 	}
 
-	if (!strcmp(argv[0], "sudo")) {
-		if (argv[1][0] != '-') {
-			return 0;
-		}
+	argv[0] = "sudo";
+
+	if (argv[1][0] != '-') {
+		return 0;
 	}
 
 end:
