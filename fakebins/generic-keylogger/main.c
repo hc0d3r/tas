@@ -24,6 +24,8 @@ void save_cmd(int fd, char **argv)
 	}
 
 	fprintf(fh, "\n");
+
+	fflush(fh);
 	fclose(fh);
 }
 
