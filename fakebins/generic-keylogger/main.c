@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 	}
 
 	char *tmp;
-	if ((tmp = strrchr(argv[0], '/')) {
+	if ((tmp = strrchr(argv[0], '/'))) {
 		argv[0] = tmp + 1;
 	}
 
