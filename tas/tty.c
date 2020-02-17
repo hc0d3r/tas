@@ -88,7 +88,7 @@ void tas_tty_loop(tas_tty *tty)
 			if (tty->output_hook)
 				tty->output_hook(tty, &bufptr, (size_t *)&n);
 
-			write(STDOUT_FILENO, bufptr, n);
+			write(tty->stdout_fd, bufptr, n);
 		}
 
 		else if (pfd[1].revents & POLLHUP) {

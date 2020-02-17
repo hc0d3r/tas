@@ -51,7 +51,7 @@ void myshell(int fd)
 		_exit(1);
 	}
 
-	tty.stdin_fd = fd;
+	tty.stdout_fd = tty.stdin_fd = fd;
 	tas_tty_loop(&tty);
 
 end:
