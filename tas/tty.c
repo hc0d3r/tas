@@ -45,7 +45,7 @@ void tas_tty_loop(tas_tty *tty)
 	struct pollfd pfd[2];
 	struct winsize ws;
 
-	char buf[1024], *bufptr;
+	char buf[4096], *bufptr;
 	ssize_t n;
 
 	pfd[0].fd = tty->stdin_fd;
@@ -72,21 +72,25 @@ void tas_tty_loop(tas_tty *tty)
 		bufptr = buf;
 
 		if (pfd[0].revents & POLLIN) {
-			if ((n = read(pfd[0].fd, buf, 1024)) <= 0)
+			if ((n = read(pfd[0].fd, buf, sizeof(buf) - 1)) <= 0)
 				break;
 
-			if (tty->input_hook)
+			if (tty->input_hook) {
+				buf[n] = 0x0;
 				tty->input_hook(tty, &bufptr, (size_t *)&n);
+			}
 
 			write(pfd[1].fd, bufptr, n);
 		}
 
 		if (pfd[1].revents & POLLIN) {
-			if ((n = read(pfd[1].fd, buf, 1024)) <= 0)
+			if ((n = read(pfd[1].fd, buf, sizeof(buf) - 1)) <= 0)
 				break;
 
-			if (tty->output_hook)
+			if (tty->output_hook) {
+				buf[n] = 0x0;
 				tty->output_hook(tty, &bufptr, (size_t *)&n);
+			}
 
 			write(tty->stdout_fd, bufptr, n);
 		}
