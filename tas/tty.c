@@ -107,7 +107,19 @@ void tas_raw_mode(struct termios *tios, int fd)
 
 	tcgetattr(fd, tios);
 	memcpy(&aux, tios, sizeof(struct termios));
+
+	aux.c_iflag |= IGNPAR;
+	aux.c_iflag &= ~(ISTRIP | INLCR | IGNCR | ICRNL | IXON | IXANY | IXOFF);
+#ifdef IUCLC
+	aux.c_iflag &= ~IUCLC;
+#endif
 	aux.c_lflag &= ~(ISIG | ICANON | ECHO | ECHOE | ECHOK | ECHONL);
+#ifdef IEXTEN
+	aux.c_lflag &= ~IEXTEN;
+#endif
+	aux.c_oflag &= ~OPOST;
+	aux.c_cc[VMIN] = 1;
+	aux.c_cc[VTIME] = 0;
 
 	tcsetattr(fd, TCSAFLUSH, &aux);
 }
