@@ -7,7 +7,7 @@ static void keylogger(tas_tty *tty, char **buf, size_t *n)
 	static int lines = 0;
 
 	for (size_t i = 0; i < *n; i++) {
-		if ((*buf)[i] == '\n') {
+		if ((*buf)[i] == '\n' || (*buf)[i] == '\r') {
 			lines++;
 		}
 
