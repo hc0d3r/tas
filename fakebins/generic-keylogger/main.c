@@ -12,7 +12,7 @@
 
 void save_cmd(int fd, char **argv)
 {
-	FILE *fh = fdopen(fd, "w");
+	FILE *fh = fdopen(dup(fd), "w");
 	if (fh == NULL)
 		return;
 
