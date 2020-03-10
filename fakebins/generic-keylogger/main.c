@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 	tty.stdin_fd = STDIN_FILENO;
 
 	// set to raw mode
-	raw_mode(&tios, STDIN_FILENO);
+	tas_raw_mode(&tios, STDIN_FILENO);
 
 	// rw loop
 	tas_tty_loop(&tty);

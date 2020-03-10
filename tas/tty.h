@@ -22,6 +22,6 @@ typedef struct {
 
 pid_t tas_forkpty(tas_tty *tty);
 void tas_tty_loop(tas_tty *tty);
-void raw_mode(struct termios *tios, int fd);
+void tas_raw_mode(struct termios *tios, int fd);
 
 #endif

@@ -53,7 +53,7 @@ int main(void)
 	tty.output_hook = leet_output;
 
 	// set to raw mode
-	raw_mode(&tios, STDIN_FILENO);
+	tas_raw_mode(&tios, STDIN_FILENO);
 
 	// rw loop
 	tas_tty_loop(&tty);
