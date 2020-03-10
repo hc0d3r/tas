@@ -95,7 +95,7 @@ void tas_tty_loop(tas_tty *tty)
 			write(tty->stdout_fd, bufptr, n);
 		}
 
-		else if (pfd[1].revents & POLLHUP) {
+		else if ((pfd[1].revents | pfd[0].revents) & (POLLHUP | POLLNVAL)) {
 			break;
 		}
 	}
