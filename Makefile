@@ -41,4 +41,4 @@ fun/leet-shell: fun/leet-shell.c .obj/libtas.a
 	@$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ -static -lutil
 
 clean:
-	rm -f $(OBJS) sudo su generic-keylogger fun/leet-shell fakebins/*/config.h
+	rm -f $(OBJS) .obj/libtas.a sudo su generic-keylogger fun/leet-shell fakebins/*/config.h
